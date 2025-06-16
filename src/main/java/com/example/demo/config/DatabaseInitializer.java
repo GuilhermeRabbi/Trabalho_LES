@@ -14,14 +14,12 @@ import com.example.demo.model.Cliente;
 import com.example.demo.model.Endereco;
 import com.example.demo.model.Funcionario;
 import com.example.demo.model.InterfacePermissao;
-import com.example.demo.model.Permissao;
 import com.example.demo.model.Produto;
 import com.example.demo.model.TipoPermissao;
 import com.example.demo.service.ClienteService;
 import com.example.demo.service.EnderecoService;
 import com.example.demo.service.FuncionarioService;
 import com.example.demo.service.InterfacePermissaoService;
-import com.example.demo.service.PermissaoService;
 import com.example.demo.service.ProdutoService;
 import com.example.demo.service.TipoPermissaoService;
 
@@ -36,7 +34,6 @@ public class DatabaseInitializer {
             EnderecoService enderecoService,
             ClienteService clienteService,
             ProdutoService produtoService,
-            PermissaoService permissaoService,
             PasswordEncoder passwordEncoder) {
         return args -> {
             // Inicializa permissões
@@ -51,8 +48,7 @@ public class DatabaseInitializer {
             }
 
             // Inicializa interfaces
-            List<String> interfaces = Arrays.asList("Funcionario", "Fornecedor", "Produto", "Venda", "Cliente",
-                    "Compras", "Registrar Venda", "Relatorio");
+            List<String> interfaces = Arrays.asList("Funcionario", "Fornecedor", "Produto", "Venda", "Cliente");
             for (String descricao : interfaces) {
                 if (!interfacePermissaoService.existsByDescricao(descricao)) {
                     InterfacePermissao interfacePermissao = new InterfacePermissao();
@@ -124,29 +120,6 @@ public class DatabaseInitializer {
                 // Salva os produtos
                 produtoService.saveAll(produto1);
                 produtoService.saveAll(produto2);
-            }
-
-            List<InterfacePermissao> permissoes2 = interfacePermissaoService.findAll();
-            List<Funcionario> funcionarios = funcionarioService.findAll();
-            List<TipoPermissao> tipos2 = tipoPermissaoService.findAll();
-            for (Funcionario funcionario : funcionarios) {
-                for (InterfacePermissao permissao : permissoes2) {
-                    for (TipoPermissao tipoPermissao : tipos2) {
-                        if (permissaoService.findByFuncionarioAndTipoPermissaoAndInterfacePermissao(funcionario.getId(),
-                                tipoPermissao.getId(), permissao.getId()) != null) {
-                            return;
-                        } else {
-                            Permissao perm = new Permissao();
-                            perm.setAtivo(true);
-                            perm.setFuncionario(funcionario);
-                            perm.setInterfacePermissao(permissao);
-                            perm.setTipoPermissao(tipoPermissao);
-                            permissaoService.salvar(perm);
-                        }
-
-                    }
-
-                }
             }
         };
     }
